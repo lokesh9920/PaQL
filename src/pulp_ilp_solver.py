@@ -14,7 +14,7 @@ class ILPSolver:
             sys.exit('Unknown Objective: {} in fetch_the_required_ilp_problem_type of pulp_ilp_solver'.format(objective))
 
 
-    def solve_ilp_using_pulp(self, table, table_name, objective, objective_attribute, constraints, count_constraint):
+    def solve_ilp_using_pulp(self, table, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints = []):
         # Finding the length if the db table
         L = len(table)
 

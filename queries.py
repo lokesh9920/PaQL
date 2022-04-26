@@ -1,17 +1,17 @@
 import sys
 
 from src.direct import DirectAlgo
-
+from src.sketch_refine import SketchRefine_Algo
 
 connection_string = 'postgresql+psycopg2://{user}:{pwd}@127.0.0.1'.format(user='postgres',pwd='lokesh123')  # For Local
 # connection_string = 'postgresql+psycopg2://cs645db.cs.umass.edu:7645'  # For Edlab
-
+num_clusters = 5
 
 
 if __name__ == '__main__':
     table_name = 'tpch'
     direct_algo = DirectAlgo(connection_string)
-
+    sketch_refine_algo = SketchRefine_Algo(connection_string)
     if sys.argv[1] == 'Q1':
         objective = 'MAX'
         objective_attribute = 'count_order'
@@ -21,4 +21,4 @@ if __name__ == '__main__':
         count_constraint = (1, None)
     else:
         sys.exit('Not a valid query')
-    direct_algo.direct(table_name, objective, objective_attribute, constraints, count_constraint)
+    sketch_refine_algo.sketchrefine_wrapper(num_clusters, table_name, objective, objective_attribute, constraints, count_constraint)

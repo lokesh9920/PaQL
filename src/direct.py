@@ -14,14 +14,13 @@ class DirectAlgo:
         self.connection = connection
         self.ilp_solver = ilp_solver
 
+    def direct_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints = []):
+        df = pd.read_sql("select * from tpch", self.connection)
+        self.implement(table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints)
 
-    def direct(self, table_name, objective, objective_attribute, constraints, count_constraint):
+    def implement(self, table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints = []):
         # Direct Algorithm
         start_time = time.time()
-
-
-
-        df = pd.read_sql("select * from tpch", self.connection)
 
         status, package_rows = self.ilp_solver.solve_ilp_using_pulp(df, table_name, objective, objective_attribute, constraints, count_constraint)
         print('Status: {}'.format(pulp.LpStatus[status]))
@@ -36,3 +35,4 @@ class DirectAlgo:
         else:
             print('Found the optimal Solution\nPackage rows: {}'.format(package_rows))
         print('Execution time: {} s'.format(round(time.time() - start_time, 2)))
+        return package_rows

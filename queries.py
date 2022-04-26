@@ -1,9 +1,17 @@
 import sys
 
-from src.direct import direct
+from src.direct import DirectAlgo
+
+
+connection_string = 'postgresql+psycopg2://{user}:{pwd}@127.0.0.1'.format(user='postgres',pwd='lokesh123')  # For Local
+# connection_string = 'postgresql+psycopg2://cs645db.cs.umass.edu:7645'  # For Edlab
+
+
 
 if __name__ == '__main__':
     table_name = 'tpch'
+    direct_algo = DirectAlgo(connection_string)
+
     if sys.argv[1] == 'Q1':
         objective = 'MAX'
         objective_attribute = 'count_order'
@@ -13,4 +21,4 @@ if __name__ == '__main__':
         count_constraint = (1, None)
     else:
         sys.exit('Not a valid query')
-    direct(table_name, objective, objective_attribute, constraints, count_constraint)
+    direct_algo.direct(table_name, objective, objective_attribute, constraints, count_constraint)

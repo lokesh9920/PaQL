@@ -1,6 +1,7 @@
 import sys
 import pulp
 
+
 class ILPSolver:
     def __init__(self):
         pass
@@ -13,8 +14,7 @@ class ILPSolver:
         else:
             sys.exit('Unknown Objective: {} in fetch_the_required_ilp_problem_type of pulp_ilp_solver'.format(objective))
 
-
-    def solve_ilp_using_pulp(self, table, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints = []):
+    def solve_ilp_using_pulp(self, table, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints=[]):
         # Finding the length if the db table
         L = len(table)
 
@@ -34,12 +34,15 @@ class ILPSolver:
         # Adding the sum constraints
         for constraint_attribute in constraints:
             if constraints[constraint_attribute][0] is not None and constraints[constraint_attribute][1] is not None:
-                prob += constraints[constraint_attribute][0] <= pulp.lpSum([rows[row_identifiers[i]] * table[constraint_attribute][i] for i in row_indexes]) <= \
+                prob += constraints[constraint_attribute][0] <= pulp.lpSum(
+                    [rows[row_identifiers[i]] * table[constraint_attribute][i] for i in row_indexes]) <= \
                         constraints[constraint_attribute][1]
             elif constraints[constraint_attribute][0] is not None:
-                prob += constraints[constraint_attribute][0] <= pulp.lpSum([rows[row_identifiers[i]] * table[constraint_attribute][i] for i in row_indexes])
+                prob += constraints[constraint_attribute][0] <= pulp.lpSum(
+                    [rows[row_identifiers[i]] * table[constraint_attribute][i] for i in row_indexes])
             elif constraints[constraint_attribute][1] is not None:
-                prob += pulp.lpSum([rows[row_identifiers[i]] * table[constraint_attribute][i] for i in row_indexes]) <= constraints[constraint_attribute][1]
+                prob += pulp.lpSum([rows[row_identifiers[i]] * table[constraint_attribute][i] for i in row_indexes]) <= constraints[constraint_attribute][
+                    1]
             else:
                 sys.exit('Stopping, the constraint attribute: {}, as there are no bounds'.format(constraint_attribute))
 
@@ -54,7 +57,7 @@ class ILPSolver:
             sys.exit('Stopping, as there are no count bounds')
 
         # Solving the problem
-        prob.solve()
+        prob.solve(pulp.PULP_CBC_CMD(maxSeconds=3600, msg=False))  # TODO check which solver is being used
 
         package_rows = []
         all_rows = []

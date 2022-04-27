@@ -15,3 +15,5 @@ install the connector: pip3 install psycopg2-binary
 install engine: pip3 install SQLAlchemy
 
 install pulp: pip3 install pulp
+
+install sklearn: pip3 install sklearn

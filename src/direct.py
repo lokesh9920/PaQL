@@ -14,15 +14,18 @@ class DirectAlgo:
         self.connection = connection
         self.ilp_solver = ilp_solver
 
-    def direct_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints = []):
+    def direct_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints=[]):
         df = pd.read_sql("select * from tpch", self.connection)
-        self.implement(table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints)
+        print('Loaded the Table of Size: {}'.format(len(df)))
+        return self.implement(table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints)
 
-    def implement(self, table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints = []):
+    def implement(self, table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints=[]):
         # Direct Algorithm
         start_time = time.time()
 
+        print('Called The ILP Solver')
         status, package_rows = self.ilp_solver.solve_ilp_using_pulp(df, table_name, objective, objective_attribute, constraints, count_constraint)
+        print('ILP Solver Completed')
         print('Status: {}'.format(pulp.LpStatus[status]))
         if pulp.LpStatus[status] == 'Not Solved':
             sys.exit('Is the default setting before a problem has been solved')

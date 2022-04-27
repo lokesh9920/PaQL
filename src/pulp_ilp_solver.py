@@ -62,7 +62,7 @@ class ILPSolver:
             prob += rows[row_identifiers[i]] == sr_constraints[i]
 
         # Solving the problem
-        prob.solve(pulp.PULP_CBC_CMD(maxSeconds=3600, msg=False))  # TODO check which solver is being used
+        prob.solve(pulp.PULP_CBC_CMD(timeLimit=3600, msg=False))  # TODO check which solver is being used
 
         package_rows = []
         all_rows = []

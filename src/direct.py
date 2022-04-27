@@ -16,6 +16,7 @@ class DirectAlgo:
 
     def direct_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint, repeat, sr_constraints=[]):
         df = pd.read_sql("select * from tpch", self.connection)
+        print('Initial Table Size: {}'.format(len(df)))
         try:
             if sys.argv[2] == 'local':
                 df = df.head(int(round(len(df) * 0.1)))

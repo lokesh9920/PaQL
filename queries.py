@@ -27,23 +27,27 @@ if __name__ == '__main__':
                        'sum_charge': (None, 95250227.7918), 'avg_qty': (None, 50.353948653), 'avg_price': (None, 68677.5852459),
                        'avg_disc': (None, 0.110243522496), 'sum_qty': (None, 77782.028739)}
         count_constraint = (1, None)
+        repeat = 0
     elif sys.argv[1] == 'Q2':
         objective = 'MIN'
         objective_attribute = 'ps_min_supplycost'
         constraints = {'p_size': (None, 8)}
         count_constraint = (1, None)
+        repeat = 0
     elif sys.argv[1] == 'Q3':
         objective = 'MIN'
         objective_attribute = 'id'
         constraints = {'revenue': (413930.849506, None)}
         count_constraint = (1, None)
+        repeat = 0
     elif sys.argv[1] == 'Q4':
         objective = 'MIN'
         objective_attribute = 'id'
         constraints = {'o_totalprice': (None, 453998.242103), 'o_shippriority': (3, None)}
         count_constraint = (1, None)
+        repeat = 0
     else:
         sys.exit('Not a valid query')
 
-    print(d.direct_wrapper(table_name, objective, objective_attribute, constraints, count_constraint))
+    print(d.direct_wrapper(table_name, objective, objective_attribute, constraints, count_constraint, repeat))
     # sketch_refine_algo.sketchrefine_wrapper(num_clusters, table_name, objective, objective_attribute, constraints, count_constraint)

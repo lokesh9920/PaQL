@@ -14,8 +14,9 @@ class ILPSolver:
         else:
             sys.exit('Unknown Objective: {} in fetch_the_required_ilp_problem_type of pulp_ilp_solver'.format(objective))
 
-    def solve_ilp_using_pulp(self, table, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints=[]):
+    def solve_ilp_using_pulp(self, table, table_name, objective, objective_attribute, constraints, count_constraint, repeat, sr_constraints=[]):
         # Finding the length if the db table
+        # sr_constraints -> limit the  number of times an instance is allowed in solution; the length should be equal to number of rows in table
         L = len(table)
 
         # Creating the Row identifiers
@@ -23,7 +24,7 @@ class ILPSolver:
         row_indexes = [int(i.strip('row_')) for i in row_identifiers]  # TODO Can be Optimized
 
         # Adding Constrains to the variables
-        rows = pulp.LpVariable.dicts("rows", indexs=row_identifiers, lowBound=0, upBound=1, cat='Integer', indexStart=[])
+        rows = pulp.LpVariable.dicts("rows", indexs=row_identifiers, lowBound=0, upBound=1 + repeat, cat='Integer', indexStart=[])
 
         # Creating rows finder problem
         prob = pulp.LpProblem("rows finder", self.fetch_the_required_ilp_problem_type(objective))
@@ -56,6 +57,10 @@ class ILPSolver:
         else:
             sys.exit('Stopping, as there are no count bounds')
 
+        # Adding The Repetition constraints
+        for i in range(len(sr_constraints)):
+            prob += rows[row_identifiers[i]] == sr_constraints[i]
+
         # Solving the problem
         prob.solve(pulp.PULP_CBC_CMD(maxSeconds=3600, msg=False))  # TODO check which solver is being used
 
@@ -65,7 +70,7 @@ class ILPSolver:
             all_rows.append(v.varValue)
             if v.varValue == 1:
                 package_rows.append(int(v.name.strip('rows_row_')) + 1)
-        print('Rows Vector: {}'.format(all_rows))
+        # print('Rows Vector: {}'.format(all_rows))
 
         # Returning the variables
         return prob.status, package_rows

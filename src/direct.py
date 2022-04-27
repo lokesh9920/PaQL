@@ -14,17 +14,24 @@ class DirectAlgo:
         self.connection = connection
         self.ilp_solver = ilp_solver
 
-    def direct_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint, sr_constraints=[]):
+    def direct_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint, repeat, sr_constraints=[]):
         df = pd.read_sql("select * from tpch", self.connection)
+        try:
+            if sys.argv[2] == 'local':
+                df = df.head(int(round(len(df) * 0.1)))
+        except Exception as e:
+            print('Running on 100% data')
+        df.reset_index(inplace=True)
         print('Loaded the Table of Size: {}'.format(len(df)))
-        return self.implement(table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints)
+        return self.implement(table_name, objective, objective_attribute, constraints, count_constraint, df, repeat, sr_constraints)
 
-    def implement(self, table_name, objective, objective_attribute, constraints, count_constraint, df, sr_constraints=[]):
+    def implement(self, table_name, objective, objective_attribute, constraints, count_constraint, df, repeat, sr_constraints=[]):
         # Direct Algorithm
         start_time = time.time()
 
         print('Called The ILP Solver')
-        status, package_rows = self.ilp_solver.solve_ilp_using_pulp(df, table_name, objective, objective_attribute, constraints, count_constraint)
+        status, package_rows = self.ilp_solver.solve_ilp_using_pulp(df, table_name, objective, objective_attribute, constraints, count_constraint, repeat,
+                                                                    sr_constraints)
         print('ILP Solver Completed')
         print('Status: {}'.format(pulp.LpStatus[status]))
         if pulp.LpStatus[status] == 'Not Solved':

@@ -19,4 +19,4 @@ CREATE TABLE tpch
     primary key (id)
 );
 
-\COPY tpch (id, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, sum_qty, count_order, p_size, ps_min_supplycost, revenue, o_totalprice, o_shippriority) FROM '../data/sample_tpch.csv' WITH (FORMAT CSV, HEADER true);
+\COPY tpch (id, sum_base_price, sum_disc_price, sum_charge, avg_qty, avg_price, avg_disc, sum_qty, count_order, p_size, ps_min_supplycost, revenue, o_totalprice, o_shippriority) FROM 'data/tpch.csv' WITH (FORMAT CSV, HEADER true);

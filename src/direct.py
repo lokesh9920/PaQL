@@ -4,6 +4,7 @@ import pandas as pd
 import pulp
 from sqlalchemy import create_engine
 from src.pulp_ilp_solver import ILPSolver
+from collections import defaultdict
 
 
 class DirectAlgo:
@@ -19,22 +20,26 @@ class DirectAlgo:
         print('Initial Table Size: {}'.format(len(df)))
         try:
             if sys.argv[2] == 'local':
-                df = df.head(int(round(len(df) * 0.1)))
+                df = df.head(int(round(len(df) * 0.5)))
+                df.reset_index(inplace=True, drop=True)
         except Exception as e:
             print('Running on 100% data')
-        df.reset_index(inplace=True)
         print('Loaded the Table of Size: {}'.format(len(df)))
-        return self.implement(table_name, objective, objective_attribute, constraints, count_constraint, df, repeat, sr_constraints)
+        rows = self.implement(table_name, objective, objective_attribute, constraints, count_constraint, df, repeat, sr_constraints)
+        # Adding The rows to the output
+        row_indexes = []
+        for row_index in range(len(rows)):
+            row_indexes.extend([row_index] * rows[row_index])
+        return df.iloc[row_indexes].reset_index(drop=True)
 
     def implement(self, table_name, objective, objective_attribute, constraints, count_constraint, df, repeat, sr_constraints=[]):
         # Direct Algorithm
-        start_time = time.time()
 
-        print('Called The ILP Solver')
+        # print('Called The ILP Solver')
         status, package_rows = self.ilp_solver.solve_ilp_using_pulp(df, table_name, objective, objective_attribute, constraints, count_constraint, repeat,
                                                                     sr_constraints)
-        print('ILP Solver Completed')
-        print('Status: {}'.format(pulp.LpStatus[status]))
+        # print('ILP Solver Completed')
+        # print('Status: {}'.format(pulp.LpStatus[status]))
         if pulp.LpStatus[status] == 'Not Solved':
             sys.exit('Is the default setting before a problem has been solved')
         elif pulp.LpStatus[status] == 'Infeasible':
@@ -44,6 +49,5 @@ class DirectAlgo:
         elif pulp.LpStatus[status] == 'Undefined':
             sys.exit('Feasible solution hasn\'t been found (but may exist)')
         else:
-            print('Found the optimal Solution\nPackage rows: {}'.format(package_rows))
-        print('Execution time: {} s'.format(round(time.time() - start_time, 2)))
-        return package_rows
+            pass
+        return [int(i) for i in package_rows]

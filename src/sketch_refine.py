@@ -1,24 +1,19 @@
 import pandas as pd
 import numpy as np
 from src.direct import DirectAlgo
-from sklearn.cluster import KMeans
 
 
 class SketchRefine_Algo:
-    def __init__(self, connection_string):
+    def __init__(self, connection_string, clusters):
         direct_algo = DirectAlgo(connection_string)
         self.direct_algo = direct_algo
         self.connection = direct_algo.connection
+        self.clusters = clusters
 
-    def get_clusters(self, X, num_clusters):
-        ## returns K-means clusters
-        clusters = KMeans(n_clusters=num_clusters, random_state=0).fit(X)
-        return clusters
-
-    def sketchrefine_wrapper(self, num_clusters, table_name, objective, objective_attribute, constraints, count_constraint):
+    def sketchrefine_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint):
         df = pd.read_sql("select * from tpch", self.connection)
         X = df.values
-        k_means = self.get_clusters(X, num_clusters)
+        k_means = self.clusters
         centroids = k_means.cluster_centers_
         centroids_df = pd.DataFrame(centroids, columns=df.columns)
         self.implement(table_name, objective, objective_attribute, constraints, count_constraint, centroids_df, df, k_means)

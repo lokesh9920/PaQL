@@ -13,9 +13,11 @@ class DirectAlgo:
         ilp_solver = ILPSolver()
         self.connection = connection
         self.ilp_solver = ilp_solver
-
-    def direct_wrapper(self, table_name, objective, objective_attribute, constraints, count_constraint, repeat, sr_constraints=[]):
-        df = pd.read_sql("select * from tpch", self.connection)
+    '''
+        TODO: changed the method signature of this method,
+        Added df to the parameters
+    '''
+    def direct_wrapper(self, df, table_name, objective, objective_attribute, constraints, count_constraint, repeat, sr_constraints=[]):
         print('Initial Table Size: {}'.format(len(df)))
         try:
             if sys.argv[2] == 'local':

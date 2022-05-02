@@ -1,4 +1,5 @@
 import sys
+import time
 
 from src.direct import DirectAlgo
 from src.sketch_refine import SketchRefine_Algo
@@ -11,8 +12,8 @@ try:
 except Exception as e:
     env = ''
 
-if env == 'local':
-    connection_string = 'postgresql+psycopg2://{user}:{pwd}@127.0.0.1'.format(user='postgres', pwd='lokesh123')  # For Local
+if env == 'local-test':
+    connection_string = 'postgresql+psycopg2://{user}:{pwd}@127.0.0.1'.format(user='postgres', pwd='.123')  # For Local
 else:
     connection_string = 'postgresql+psycopg2://cs645db.cs.umass.edu:7645'  # For Edlab
 num_clusters = 10
@@ -72,5 +73,11 @@ if __name__ == '__main__':
     else:
         sys.exit('Not a valid query')
 
-    print(d.direct_wrapper(df, table_name, objective, objective_attribute, constraints, count_constraint, repeat))
-    # sketch_refine_algo.sketchrefine_wrapper(num_clusters, table_name, objective, objective_attribute, constraints, count_constraint)
+    start_time = time.time()
+    rows_df = d.direct_wrapper(table_name, objective, objective_attribute, constraints, count_constraint, repeat)
+    print('Execution Time: {} s'.format(time.time() - start_time))
+    print('Ids Using Direct:\n{}'.format(list(rows_df['id'])))
+    start_time = time.time()
+    rows_df = sketch_refine_algo.sketchrefine_wrapper(num_clusters, table_name, objective, objective_attribute, constraints, count_constraint, repeat)
+    print('Execution Time: {} s'.format(time.time() - start_time))
+    print('Ids Using Sketch_Refine:\n{}'.format([int(i) for i in list(rows_df['id'])]))

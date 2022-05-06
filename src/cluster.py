@@ -15,10 +15,10 @@ class cluster:
 
     def get_clusters(self, X, num_clusters, num_elements_per_cluster):
         ## returns K-means clusters
-        clusters = KMeans(n_clusters=num_clusters, random_state=0).fit(X)
+        clusters = KMeans(n_clusters=num_clusters, random_state=0).fit(X[:, 1:])
         #print('Length of each cluster BEFORE reshuffling: {}' .format(self.debug_print(clusters)))
 
-        clusters = self.reshuffle_tuples(X, clusters, num_elements_per_cluster) #gives custom clusters
+        clusters = self.reshuffle_tuples(X[:, 1:], clusters, num_elements_per_cluster) #gives custom clusters
 
         #print('Length of each cluster AFTER reshuffling: {}'.format(self.debug_print(clusters)))
         return clusters

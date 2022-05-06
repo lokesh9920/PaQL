@@ -13,21 +13,30 @@ except Exception as e:
     env = ''
 
 if env == 'local-test':
-    connection_string = 'postgresql+psycopg2://{user}:{pwd}@127.0.0.1'.format(user='postgres', pwd='.123')  # For Local
+    connection_string = 'postgresql+psycopg2://{user}:{pwd}@127.0.0.1'.format(user='postgres', pwd='lokesh123')  # For Local
 else:
     connection_string = 'postgresql+psycopg2://cs645db.cs.umass.edu:7645'  # For Edlab
-num_clusters = 10
-num_elements_per_cluster = 16
+num_clusters = 300
+num_elements_per_cluster = 205
 d = DirectAlgo(connection_string)
 
+total_rows = 6001215
+percent_to_load = 0.01
+
+loading_rows = int(total_rows * percent_to_load)
+
+print('Loading number of rows: ', loading_rows)
 ##getting clusters
-df = pd.read_sql("select * from tpch", d.connection)
+df = pd.read_sql("select * from tpch order by id limit " + str(loading_rows), d.connection)
+print('Data Loaded ', len(df))
 X = df.values
 k_means_obj = cluster()
 custom_clusters = k_means_obj.get_clusters(X, num_clusters, num_elements_per_cluster)
+print('Created clusters')
+
 print(custom_clusters.labels_.shape)
 centroids = custom_clusters.cluster_centers_
-centroids_df = pd.DataFrame(centroids, columns=df.columns)
+centroids_df = pd.DataFrame(centroids, columns=df.columns.values[1:])
 
 if __name__ == '__main__':
     table_name = 'tpch'
@@ -74,10 +83,8 @@ if __name__ == '__main__':
         sys.exit('Not a valid query')
 
     start_time = time.time()
-    rows_df = d.direct_wrapper(table_name, objective, objective_attribute, constraints, count_constraint, repeat)
+    rows_df = d.direct_wrapper(df, table_name, objective, objective_attribute, constraints, count_constraint, repeat)
     print('Execution Time: {} s'.format(time.time() - start_time))
     print('Ids Using Direct:\n{}'.format(list(rows_df['id'])))
-    start_time = time.time()
-    rows_df = sketch_refine_algo.sketchrefine_wrapper(num_clusters, table_name, objective, objective_attribute, constraints, count_constraint, repeat)
-    print('Execution Time: {} s'.format(time.time() - start_time))
+    rows_df = sketch_refine_algo.sketchrefine_wrapper(df, num_clusters, table_name, objective, objective_attribute, constraints, count_constraint, repeat)
     print('Ids Using Sketch_Refine:\n{}'.format([int(i) for i in list(rows_df['id'])]))

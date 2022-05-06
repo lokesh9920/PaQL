@@ -55,7 +55,9 @@ class ILPSolver:
         # Adding The Repetition constraints
         for i in range(len(sr_constraints)):
             prob += rows[row_identifiers[i]] <= sr_constraints[i] * (1 + repeat)
-
+        #
+        # print('The prob formulated is: ')
+        # print(prob)
         # Solving the problem
         prob.solve(pulp.PULP_CBC_CMD(timeLimit=3600, msg=False))  # TODO check which solver is being used
 

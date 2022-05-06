@@ -4,6 +4,7 @@ from src.direct import DirectAlgo
 from sklearn.cluster import KMeans
 from collections import defaultdict
 import sys
+import time
 
 
 class SketchRefine_Algo:
@@ -18,8 +19,8 @@ class SketchRefine_Algo:
         clusters = KMeans(n_clusters=num_clusters, random_state=0).fit(X)
         return clusters
 
-    def sketchrefine_wrapper(self, num_clusters, table_name, objective, objective_attribute, constraints, count_constraint, repeat):
-        df = pd.read_sql("select * from tpch", self.connection)
+    def sketchrefine_wrapper(self, df, num_clusters, table_name, objective, objective_attribute, constraints, count_constraint, repeat):
+        # df = pd.read_sql("select * from tpch", self.connection)
         print('Initial Table Size: {}'.format(len(df)))
         try:
             if sys.argv[2] == 'local':
@@ -50,6 +51,7 @@ class SketchRefine_Algo:
         return count
 
     def implement(self, table_name, objective, objective_attribute, constraints, count_constraint, repeat, centroids_df, cluster_entries, k_means):
+        start_time = time.time()
         sr_constraints = self.sr_algo_constraints(k_means=k_means)
         sketch_rows = self.direct_algo.implement(table_name, objective, objective_attribute, constraints, count_constraint, centroids_df, repeat,
                                                  sr_constraints)
@@ -78,4 +80,5 @@ class SketchRefine_Algo:
                 for row_index in range(len(rows)):
                     row_indexes.extend([row_index] * rows[row_index])
                 original_rows.append(pi.iloc[row_indexes])
+        print('Execution Time: {} s'.format(time.time() - start_time))
         return pd.concat(original_rows, ignore_index=True)
